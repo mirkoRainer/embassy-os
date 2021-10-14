@@ -36,6 +36,9 @@ export module RR {
   export type UpdateServerReq = WithExpire<{ }> // server.update
   export type UpdateServerRes = WithRevision<'updating' | 'no-updates'>
 
+  export type UpdateEmailReq = WithExpire<{ email: string }> // server.config.update-email
+  export type UpdateEmailRes = WithRevision<null>
+
   export type RestartServerReq = { } // server.restart
   export type RestartServerRes = null
 

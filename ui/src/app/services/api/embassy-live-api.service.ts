@@ -72,6 +72,10 @@ export class LiveApiService extends ApiService {
     return this.http.rpcRequest({ method: 'server.update', params })
   }
 
+  async updateEmailRaw (params: RR.UpdateEmailReq): Promise<RR.UpdateEmailRes> {
+    return this.http.rpcRequest({ method: 'server.config.update-email', params })
+  }
+
   async restartServer (params: RR.RestartServerReq): Promise<RR.RestartServerRes> {
     return this.http.rpcRequest({ method: 'server.restart', params })
   }

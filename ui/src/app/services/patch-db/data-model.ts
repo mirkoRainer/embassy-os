@@ -17,6 +17,7 @@ export interface UIData {
 export interface ServerInfo {
   id: string
   version: string
+  email: string | null
   'lan-address': URL
   'tor-address': URL
   status: ServerStatus

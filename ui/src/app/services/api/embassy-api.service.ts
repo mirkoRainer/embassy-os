@@ -64,6 +64,11 @@ export abstract class ApiService implements Source<DataModel>, Http<DataModel> {
     return res
   }
 
+  protected abstract updateEmailRaw (params: RR.UpdateEmailReq): Promise<RR.UpdateEmailRes>
+  updateEmail = (params: RR.UpdateEmailReq) => this.syncResponse(
+    () => this.updateEmailRaw(params),
+  )()
+
   abstract restartServer (params: RR.UpdateServerReq): Promise<RR.RestartServerRes>
 
   abstract shutdownServer (params: RR.ShutdownServerReq): Promise<RR.ShutdownServerRes>

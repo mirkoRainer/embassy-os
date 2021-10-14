@@ -1,9 +1,10 @@
 import { Component } from '@angular/core'
-import { AlertController, LoadingController, NavController } from '@ionic/angular'
+import { AlertController, LoadingController, ModalController, NavController, ToastController } from '@ionic/angular'
 import { ApiService } from 'src/app/services/api/embassy-api.service'
 import { ActivatedRoute } from '@angular/router'
 import { ErrorToastService } from 'src/app/services/error-toast.service'
 import { PatchDbService } from 'src/app/services/patch-db/patch-db.service'
+import { GenericInputComponent } from 'src/app/modals/generic-input/generic-input.component'
 
 @Component({
   selector: 'server-show',
@@ -16,6 +17,8 @@ export class ServerShowPage {
   constructor (
     private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,
+    private readonly modalCtrl: ModalController,
+    private readonly toastCtrl: ToastController,
     private readonly errToast: ErrorToastService,
     private readonly embassyApi: ApiService,
     private readonly navCtrl: NavController,
@@ -103,6 +106,56 @@ export class ServerShowPage {
     }
   }
 
+  private async presentModalEmail (): Promise<void> {
+    const { name, description } = emailSpec
+
+    const modal = await this.modalCtrl.create({
+      component: GenericInputComponent,
+      componentProps: {
+        title: name,
+        message: description,
+        label: name,
+        useMask: false,
+        nullable: true,
+        value: this.patch.data['server-info'].email,
+        buttonText: 'Save',
+        loadingText: 'Saving',
+        submitFn: (email: string) => this.saveEmail(email),
+      },
+      cssClass: 'alertlike-modal',
+    })
+
+    modal.onDidDismiss().then(res => {
+      if (res.role === 'success') this.presentToastEmailSent()
+    })
+
+    await modal.present()
+  }
+
+  private async saveEmail (email: string): Promise<void> {
+    await this.embassyApi.updateEmail({ email })
+  }
+
+  private async presentToastEmailSent (): Promise<void> {
+    const toast = await this.toastCtrl.create({
+      header: 'Email Sent!',
+      message: 'Check your spam folder and mark as not spam.',
+      position: 'bottom',
+      duration: 4000,
+      cssClass: 'success-toast',
+      buttons: [
+        {
+          side: 'end',
+          icon: 'close',
+          handler: () => {
+            return true
+          },
+        },
+      ],
+    })
+    await toast.present()
+  }
+
   private setButtons (): void {
     this.settings = {
       'Backups': [
@@ -173,6 +226,13 @@ export class ServerShowPage {
           action: () => this.navCtrl.navigateForward(['sessions'], { relativeTo: this.route }),
           detail: true,
         },
+        {
+          title: 'Email',
+          description: 'Receive email notifications from your Embassy',
+          icon: 'mail-outline',
+          action: () => this.presentModalEmail(),
+          detail: true,
+        },
       ],
       'Power': [
         {
@@ -206,4 +266,16 @@ interface ServerSettings {
     action: Function
     detail: boolean
   }[]
+}
+
+const emailSpec = {
+  type: 'string',
+  name: 'Email Address',
+  description: 'Enter a valid email address to receive critical alerts from your Embassy. Leave blank to disable email alerts.',
+  nullable: true,
+  // @TODO regex for SSH Key
+  // pattern: '',
+  'pattern-description': 'Must be a valid email address',
+  masked: false,
+  copyable: false,
 }

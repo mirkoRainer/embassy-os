@@ -126,6 +126,18 @@ export class MockApiService extends ApiService {
     return res
   }
 
+  async updateEmailRaw (params: RR.UpdateEmailReq): Promise<RR.UpdateEmailRes> {
+    await pauseFor(2000)
+    const patch = [
+      {
+        op: PatchOp.REPLACE,
+        path: '/server-info/email',
+        value: params.email,
+      },
+    ]
+    return this.http.rpcRequest<WithRevision<null>>({ method: 'db.patch', params: { patch } })
+  }
+
   async restartServer (params: RR.RestartServerReq): Promise<RR.RestartServerRes> {
     await pauseFor(2000)
     return null
