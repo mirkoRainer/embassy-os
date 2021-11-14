@@ -28,6 +28,7 @@ export class InitPage {
   }
 
   download () {
+    console.log('downloading')
     document.getElementById('tor-addr').innerHTML = this.stateService.torAddress
     document.getElementById('lan-addr').innerHTML = this.stateService.lanAddress
     document.getElementById('cert').setAttribute('href', 'data:application/x-x509-ca-cert;base64,' + encodeURIComponent(this.stateService.cert))

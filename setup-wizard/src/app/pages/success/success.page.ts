@@ -38,10 +38,12 @@ export class SuccessPage {
   }
 
   installCert () {
+    console.log('installing cert')
     document.getElementById('install-cert').click()
   }
 
   download () {
+    console.log('emitting download')
     this.onDownload.emit()
   }
 
