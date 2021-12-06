@@ -52,12 +52,12 @@ pub async fn start(
 
     let revision = tx.commit(None).await?;
 
-    ctx.managers
-        .get(&(id, version))
-        .await
-        .ok_or_else(|| Error::new(eyre!("Manager not found"), crate::ErrorKind::InvalidRequest))?
-        .synchronize()
-        .await;
+    // ctx.managers
+    //     .get(&(id, version))
+    //     .await
+    //     .ok_or_else(|| Error::new(eyre!("Manager not found"), crate::ErrorKind::InvalidRequest))?
+    //     .synchronize()
+    //     .await;
 
     Ok(WithRevision {
         revision,

@@ -263,7 +263,7 @@ async fn run_main(
         .store(true, Ordering::SeqCst);
     let health = async {
         loop {
-            tokio::time::sleep(Duration::from_secs(1)).await;
+            tokio::time::sleep(Duration::from_secs(300)).await;
             let mut db = state.ctx.db.handle();
             if let Err(e) = health::check(
                 &state.ctx,

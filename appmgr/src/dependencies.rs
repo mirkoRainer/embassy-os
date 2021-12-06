@@ -6,7 +6,7 @@ use color_eyre::eyre::eyre;
 use emver::VersionRange;
 use futures::future::BoxFuture;
 use futures::FutureExt;
-use patch_db::{DbHandle, HasModel, Map, MapModel, PatchDbHandle};
+use patch_db::{DbHandle, HasModel, Map, MapModel, PatchDbHandle, Transaction};
 use rand::SeedableRng;
 use rpc_toolkit::command;
 use serde::{Deserialize, Serialize};
@@ -869,11 +869,14 @@ pub fn heal_transitive<'a, Db: DbHandle>(
             .and_then(|m| m.installed())
             .expect(&mut tx)
             .await?;
+        tracing::debug!("acquiriing write lock for {}", id);
         let mut status = model.clone().status().get_mut(&mut tx).await?;
+        tracing::debug!("acquired write lock for {}", id);
 
-        let old = status.dependency_errors.0.remove(dependency);
+        let old: Option<DependencyError> = status.dependency_errors.0.remove(dependency);
 
         if let Some(old) = old {
+            tracing::debug!("acquiriing read lock for {}", dependency);
             let info = model
                 .manifest()
                 .dependencies()
@@ -882,20 +885,32 @@ pub fn heal_transitive<'a, Db: DbHandle>(
                 .await?
                 .get(&mut tx, true)
                 .await?;
+            tracing::debug!("acquired read lock for {}", dependency);
+            tracing::debug!(
+                "trying to heal error for {}'s dependency on {}",
+                id,
+                dependency
+            );
             if let Some(new) = old
                 .try_heal(ctx, &mut tx, id, dependency, None, &*info)
                 .await?
             {
+                tracing::debug!("Still has dep errors: {}", &new);
                 status.dependency_errors.0.insert(dependency.clone(), new);
+                tracing::debug!("Saving status");
                 status.save(&mut tx).await?;
+                tracing::debug!("Saving transaction");
                 tx.save().await?;
+                tracing::debug!("Transaction saved");
             } else {
+                tracing::debug!("Saving status");
                 status.save(&mut tx).await?;
+                tracing::debug!("Saving transaction");
                 tx.save().await?;
+                tracing::debug!("Recurse");
                 heal_all_dependents_transitive(ctx, db, id).await?;
             }
         }
-
         Ok(())
     }
     .boxed()
