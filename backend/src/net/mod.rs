@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use openssl::pkey::{PKey, Private};
 use openssl::x509::X509;
 use rpc_toolkit::command;
-use sqlx::SqlitePool;
+use sqlx::{Executor, Sqlite, SqlitePool};
 use torut::onion::{OnionAddressV3, TorSecretKeyV3};
 use tracing::instrument;
 
@@ -151,6 +151,37 @@ impl NetController {
         tor_res?;
         nginx_res?;
         Ok(())
+    }
+
+    pub async fn install<Ex>(
+        &self,
+        secrets: &mut Ex,
+        pkg_id: &PackageId,
+        if_id: &InterfaceId,
+        interface: &Interface,
+        tor_key: &TorSecretKeyV3,
+    ) -> Result<(), Error>
+    where
+        for<'a> &'a mut Ex: Executor<'a, Database = Sqlite>,
+    {
+        todo!()
+    }
+    pub async fn uninstall<Ex>(
+        &self,
+        secrets: &mut Ex,
+        pkg_id: &PackageId,
+        if_id: &InterfaceId,
+    ) -> Result<(), Error>
+    where
+        for<'a> &'a mut Ex: Executor<'a, Database = Sqlite>,
+    {
+        todo!()
+    }
+    pub async fn enable(&self, pkg_id: &PackageId, if_id: &InterfaceId) -> Result<(), Error> {
+        todo!()
+    }
+    pub async fn disable(&self, pkg_id: &PackageId, if_id: &InterfaceId) -> Result<(), Error> {
+        todo!()
     }
 
     pub async fn generate_certificate_mountpoint<'a, I>(
