@@ -1,12 +1,7 @@
 /* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
   "compilerOptions": {
-    "baseUrl": "./",
-    "outDir": "./dist/out-tsc/workspace",
     "sourceMap": true,
-    "composite": true,
-    "declaration": true,
-    "declarationMap": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
@@ -19,13 +14,10 @@
       "node_modules/@types"
     ],
   },
-  "include": [
-    "*/**.ts"
-  ],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  },
+  }
 }

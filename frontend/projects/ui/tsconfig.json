@@ -4,11 +4,14 @@
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "../../dist/out-tsc/ui",
+    /*
     "paths": {
-      "@shared/*": ["../../dist/out-tsc/workspace/shared/*"]
+      "@shared/*": ["../../dist/out-tsc/shared/src/*"]
     },
+    */
   },
-  "include": [
-    "src/**/*.ts"
+  "files": [
+    "src/main.ts",
+    "src/polyfills.ts"
   ],
 }

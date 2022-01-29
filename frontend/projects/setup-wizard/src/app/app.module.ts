@@ -17,7 +17,6 @@ import { LoadingPageModule } from './pages/loading/loading.module'
 import { ProdKeyModalModule } from './modals/prod-key-modal/prod-key-modal.module'
 import { ProductKeyPageModule } from './pages/product-key/product-key.module'
 import { RecoverPageModule } from './pages/recover/recover.module'
-import { WorkspaceConfig } from '@shared/types'
 
 const { useMocks } = require('../../../../config.json') as WorkspaceConfig
 
@@ -58,3 +57,24 @@ const { useMocks } = require('../../../../config.json') as WorkspaceConfig
   bootstrap: [AppComponent],
 })
 export class AppModule { }
+
+
+export type WorkspaceConfig = {
+  useMocks: boolean
+  ui: {
+    gitHash: string
+    patchDb: {
+      poll: {
+        cooldown: number /* in ms */
+      }
+    }
+    api: {
+      url: string
+      version: string
+    }
+    mocks: {
+      maskAs: 'tor' | 'lan'
+      skipStartupAlerts: boolean
+    }
+  }
+}

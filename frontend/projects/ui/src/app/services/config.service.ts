@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
+import { WorkspaceConfig } from '../util/misc.util'
 import { InterfaceDef, PackageDataEntry, PackageMainStatus, PackageState } from './patch-db/data-model'
-import { WorkspaceConfig } from '@shared/types'
 
 const { useMocks, ui: { gitHash, patchDb, api, mocks } } = require('../../../../../config.json') as WorkspaceConfig
 

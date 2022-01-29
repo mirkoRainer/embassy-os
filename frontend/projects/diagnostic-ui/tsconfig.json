@@ -3,12 +3,10 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": "./",
-    "outDir": "../../dist/out-tsc/setup-wizard",
-    "paths": {
-      "@shared/*": ["../../dist/out-tsc/workspace/shared/*"]
-    },
+    "outDir": "../../dist/out-tsc/diagnostic-ui",
   },
-  "include": [
-    "./src/**/*.ts"
-  ]
+  "files": [
+    "src/main.ts",
+    "src/polyfills.ts"
+  ],
 }

@@ -22,7 +22,7 @@ import { AuthService } from './services/auth.service'
 import { GlobalErrorHandler } from './services/global-error-handler.service'
 import { MockApiService } from './services/api/embassy-mock-api.service'
 import { LiveApiService } from './services/api/embassy-live-api.service'
-import { WorkspaceConfig } from '@shared/types'
+import { WorkspaceConfig } from './util/misc.util'
 
 const { useMocks } = require('../../../../config.json') as WorkspaceConfig
 

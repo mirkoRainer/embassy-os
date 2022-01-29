@@ -1,6 +1,26 @@
 import { OperatorFunction } from 'rxjs'
 import { map } from 'rxjs/operators'
 
+export type WorkspaceConfig = {
+  useMocks: boolean
+  ui: {
+    gitHash: string
+    patchDb: {
+      poll: {
+        cooldown: number /* in ms */
+      }
+    }
+    api: {
+      url: string
+      version: string
+    }
+    mocks: {
+      maskAs: 'tor' | 'lan'
+      skipStartupAlerts: boolean
+    }
+  }
+}
+
 export type Omit<ObjectType, KeysType extends keyof ObjectType> = Pick<ObjectType, Exclude<keyof ObjectType, KeysType>>
 export type PromiseRes<T> = { result: 'resolve', value: T } | { result: 'reject', value: Error }
 
