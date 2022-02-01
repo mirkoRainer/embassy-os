@@ -13,7 +13,7 @@ cd $DIR/..
 
 truncate --size=$[(31116287+1)*512] eos.img
 export OUTPUT_DEVICE=$(sudo losetup --show -fP eos.img)
-export LOOPDEV=$(sudo losetup --show -fP ubuntu.img)
+export LOOPDEV=$(sudo losetup --show -fP raspios.img)
 ./build/partitioning.sh
 ./build/write-image.sh
 sudo e2fsck -f ${OUTPUT_DEVICE}p3
