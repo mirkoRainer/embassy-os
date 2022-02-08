@@ -19,11 +19,7 @@ import { Emver } from './services/emver.service'
 import { SplitPaneTracker } from './services/split-pane.service'
 import { ToastButton } from '@ionic/core'
 import { PatchDbService } from './services/patch-db/patch-db.service'
-import {
-  ServerStatus,
-  UIData,
-  UIMarketplaceData,
-} from './services/patch-db/data-model'
+import { ServerStatus, UIData } from './services/patch-db/data-model'
 import {
   ConnectionFailure,
   ConnectionService,
@@ -34,7 +30,7 @@ import { debounce, isEmptyObject } from './util/misc.util'
 import { ErrorToastService } from './services/error-toast.service'
 import { Subscription } from 'rxjs'
 import { EOSService } from './services/eos.service'
-import { v4 } from 'uuid'
+import { MarketplaceService } from './pages/marketplace-routes/marketplace.service'
 
 @Component({
   selector: 'app-root',
@@ -94,6 +90,7 @@ export class AppComponent {
     private readonly emver: Emver,
     private readonly connectionService: ConnectionService,
     private readonly startupAlertsService: StartupAlertsService,
+    private readonly marketplaceService: MarketplaceService,
     private readonly toastCtrl: ToastController,
     private readonly errToast: ErrorToastService,
     private readonly patch: PatchDbService,
@@ -130,7 +127,6 @@ export class AppComponent {
           this.watchConnection(),
           // watch router to highlight selected menu item
           this.watchRouter(),
-          // watch status to display/hide maintenance page
         ])
 
         this.patch
@@ -152,6 +148,8 @@ export class AppComponent {
               this.watchVersion(),
               // watch unread notification count to display toast
               this.watchNotifications(),
+              // watch marketplace URL for changes
+              this.marketplaceService.init(),
               // run startup alerts
               this.startupAlertsService.runChecks(),
             ])
