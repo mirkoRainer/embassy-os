@@ -297,8 +297,8 @@ export class AppComponent {
           this.presentToastUpdated()
         }
       })
-    })
   }
+  m
 
   private watchUpdateProgress(): Subscription {
     return this.patch

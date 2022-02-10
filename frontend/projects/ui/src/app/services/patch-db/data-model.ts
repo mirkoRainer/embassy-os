@@ -31,9 +31,6 @@ export interface ServerInfo {
   'last-backup': string | null
   'lan-address': URL
   'tor-address': URL
-  'eos-marketplace': URL
-  'package-marketplace': URL | null // uses EOS marketplace if null
-  'share-stats': boolean
   'unread-notification-count': number
   'status-info': {
     'backing-up': boolean

@@ -90,21 +90,6 @@ export class MockApiService extends ApiService {
 
   // server
 
-  async setShareStatsRaw(
-    params: RR.SetShareStatsReq,
-  ): Promise<RR.SetShareStatsRes> {
-    await pauseFor(2000)
-    const patch = [
-      {
-        op: PatchOp.REPLACE,
-        path: '/server-info/share-stats',
-        value: params.value,
-      },
-    ]
-
-    return this.withRevision(patch)
-  }
-
   async getServerLogs(
     params: RR.GetServerLogsReq,
   ): Promise<RR.GetServerLogsRes> {
