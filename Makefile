@@ -1,6 +1,6 @@
 EMBASSY_BINS := backend/target/aarch64-unknown-linux-gnu/release/embassyd backend/target/aarch64-unknown-linux-gnu/release/embassy-init backend/target/aarch64-unknown-linux-gnu/release/embassy-cli backend/target/aarch64-unknown-linux-gnu/release/embassy-sdk
 EMBASSY_UIS := frontend/dist/ui frontend/dist/setup-wizard frontend/dist/diagnostic-ui
-EMBASSY_SRC := raspios.img product_key.txt $(EMBASSY_BINS) backend/embassyd.service backend/embassy-init.service $(EMBASSY_UIS) $(shell find build)
+EMBASSY_SRC := ubuntu.iso product_key.txt $(EMBASSY_BINS) backend/embassyd.service backend/embassy-init.service $(EMBASSY_UIS) $(shell find build)
 COMPAT_SRC := $(shell find system-images/compat/src)
 UTILS_SRC := $(shell find system-images/utils/Dockerfile)
 BACKEND_SRC := $(shell find backend/src) $(shell find patch-db/*/src) $(shell find rpc-toolkit/*/src) backend/Cargo.toml backend/Cargo.lock
