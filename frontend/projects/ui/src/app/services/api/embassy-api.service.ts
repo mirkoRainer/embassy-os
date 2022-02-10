@@ -83,7 +83,7 @@ export abstract class ApiService implements Source<DataModel>, Http<DataModel> {
   }
 
   abstract restartServer(
-    params: RR.UpdateServerReq,
+    params: RR.RestartServerReq,
   ): Promise<RR.RestartServerRes>
 
   abstract shutdownServer(
