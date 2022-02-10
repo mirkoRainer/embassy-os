@@ -8,11 +8,9 @@ use tokio::sync::RwLock;
 use tracing::instrument;
 
 use crate::context::RpcContext;
-use crate::db::util::WithRevision;
 use crate::disk::util::{get_available, get_percentage, get_used};
 use crate::logs::{display_logs, fetch_logs, LogResponse, LogSource};
 use crate::shutdown::Shutdown;
-use crate::util::display_none;
 use crate::util::serde::{display_serializable, IoFormat};
 use crate::{Error, ErrorKind};
 
@@ -605,53 +603,26 @@ async fn get_mem_info() -> Result<MetricsMemory, Error> {
 async fn get_disk_info() -> Result<MetricsDisk, Error> {
     let package_used_task = get_used("/embassy-data/package-data");
     let package_available_task = get_available("/embassy-data/package-data");
-    let package_percentage_task = get_percentage("/embassy-data/package-data");
     let os_used_task = get_used("/embassy-data/main");
     let os_available_task = get_available("/embassy-data/main");
-    let os_percentage_task = get_percentage("/embassy-data/main");
 
-    let (package_used, package_available, package_percentage, os_used, os_available, os_percentage) =
-        futures::try_join!(
-            package_used_task,
-            package_available_task,
-            package_percentage_task,
-            os_used_task,
-            os_available_task,
-            os_percentage_task,
-        )?;
+    let (package_used, package_available, os_used, os_available) = futures::try_join!(
+        package_used_task,
+        package_available_task,
+        os_used_task,
+        os_available_task,
+    )?;
 
     let total_used = package_used + os_used;
     let total_available = package_available + os_available;
-    let total_percentage = package_percentage + os_percentage;
     let total_size = total_used + total_available;
+    let total_percentage = total_used as f64 / total_size as f64 * 100.0f64;
 
     Ok(MetricsDisk {
         size: GigaBytes(total_size as f64 / 1_000_000_000.0),
         used: GigaBytes(total_used as f64 / 1_000_000_000.0),
         available: GigaBytes(total_available as f64 / 1_000_000_000.0),
         used_percentage: Percentage(total_percentage as f64),
-    })
-}
-
-#[command(subcommands(share_stats))]
-pub async fn config() -> Result<(), Error> {
-    Ok(())
-}
-
-#[command(rename = "share-stats", display(display_none))]
-async fn share_stats(
-    #[context] ctx: RpcContext,
-    #[arg] value: bool,
-) -> Result<WithRevision<()>, Error> {
-    let revision = crate::db::DatabaseModel::new()
-        .server_info()
-        .share_stats()
-        .put(&mut ctx.db.handle(), &value)
-        .await?;
-    ctx.logger.set_sharing(value);
-    Ok(WithRevision {
-        response: (),
-        revision,
     })
 }
 

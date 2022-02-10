@@ -13,6 +13,7 @@ import {
   AlertController,
   IonicSafeString,
   LoadingController,
+  ModalController,
   ToastController,
 } from '@ionic/angular'
 import { Emver } from './services/emver.service'
@@ -24,7 +25,6 @@ import {
   ConnectionFailure,
   ConnectionService,
 } from './services/connection.service'
-import { StartupAlertsService } from './services/startup-alerts.service'
 import { ConfigService } from './services/config.service'
 import { debounce, isEmptyObject } from './util/misc.util'
 import { ErrorToastService } from './services/error-toast.service'
@@ -32,6 +32,7 @@ import { Subscription } from 'rxjs'
 import { LocalStorageService } from './services/local-storage.service'
 import { EOSService } from './services/eos.service'
 import { MarketplaceService } from './pages/marketplace-routes/marketplace.service'
+import { OSWelcomePage } from './modals/os-welcome/os-welcome.page'
 
 @Component({
   selector: 'app-root',
@@ -95,7 +96,7 @@ export class AppComponent {
     private readonly loadingCtrl: LoadingController,
     private readonly emver: Emver,
     private readonly connectionService: ConnectionService,
-    private readonly startupAlertsService: StartupAlertsService,
+    private readonly modalCtrl: ModalController,
     private readonly marketplaceService: MarketplaceService,
     private readonly toastCtrl: ToastController,
     private readonly errToast: ErrorToastService,
@@ -146,6 +147,8 @@ export class AppComponent {
           .subscribe(data => {
             // check for updates to EOS
             this.checkForEosUpdate(data.ui)
+            // show eos welcome message
+            this.showEosWelcome(data.ui['ack-welcome'])
 
             this.subscriptions = this.subscriptions.concat([
               // watch status to present toast for updated state
@@ -158,8 +161,6 @@ export class AppComponent {
               this.watchNotifications(),
               // watch marketplace URL for changes
               this.marketplaceService.init(),
-              // run startup alerts
-              this.startupAlertsService.runChecks(),
             ])
           })
         // UNVERIFIED
@@ -216,7 +217,25 @@ export class AppComponent {
 
   private async checkForEosUpdate(ui: UIData): Promise<void> {
     if (ui['auto-check-updates']) {
-      await this.eosService.getEOS()
+      this.eosService.getEOS()
+    }
+  }
+
+  private async showEosWelcome(ackVersion: string): Promise<void> {
+    if (!this.config.skipStartupAlerts && ackVersion !== this.config.version) {
+      const modal = await this.modalCtrl.create({
+        component: OSWelcomePage,
+        presentingElement: await this.modalCtrl.getTop(),
+        componentProps: {
+          version: this.config.version,
+        },
+      })
+      modal.onWillDismiss().then(() => {
+        this.embassyApi
+          .setDbValue({ pointer: '/ack-welcome', value: this.config.version })
+          .catch()
+      })
+      modal.present()
     }
   }
 
@@ -278,6 +297,7 @@ export class AppComponent {
           this.presentToastUpdated()
         }
       })
+    })
   }
 
   private watchUpdateProgress(): Subscription {

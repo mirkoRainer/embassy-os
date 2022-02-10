@@ -12,7 +12,6 @@ export interface UIData {
   'auto-check-updates': boolean
   'pkg-order': string[]
   'ack-welcome': string // EOS version
-  'ack-share-stats': boolean
   marketplace: UIMarketplaceData
 }
 
