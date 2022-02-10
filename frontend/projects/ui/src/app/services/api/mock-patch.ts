@@ -22,7 +22,6 @@ export const mockPatchData: DataModel = {
     id: 'embassy-abcdefgh',
     version: '0.3.0',
     'last-backup': null,
-    status: ServerStatus.Running,
     'lan-address': 'https://embassy-abcdefgh.local',
     'tor-address': 'http://myveryownspecialtoraddress.onion',
     'eos-marketplace': 'https://beta-registry-0-3.start9labs.com',
@@ -32,6 +31,7 @@ export const mockPatchData: DataModel = {
     'password-hash':
       '$argon2d$v=19$m=1024,t=1,p=1$YXNkZmFzZGZhc2RmYXNkZg$Ceev1I901G6UwU+hY0sHrFZ56D+o+LNJ',
     'eos-version-compat': '>=0.3.0',
+    'status-info': null,
   },
   'recovered-packages': {
     'btc-rpc-proxy': {

@@ -32,14 +32,14 @@ export interface ServerInfo {
   'last-backup': string | null
   'lan-address': URL
   'tor-address': URL
-  status: ServerStatus
   'eos-marketplace': URL
   'package-marketplace': URL | null // uses EOS marketplace if null
   'share-stats': boolean
   'unread-notification-count': number
-  'update-progress'?: {
-    size: number
-    downloaded: number
+  'status-info': {
+    'backing-up': boolean
+    updated: boolean
+    'update-progress': { size: number | null; downloaded: number } | null
   }
   'eos-version-compat': string
   'password-hash': string
