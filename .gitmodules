@@ -5,3 +5,6 @@
 	path = patch-db
 	url = https://github.com/Start9Labs/patch-db.git
 	branch = develop
+[submodule "firmware-open"]
+	path = firmware-open
+	url = https://github.com/system76/firmware-open

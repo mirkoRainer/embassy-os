@@ -18,7 +18,7 @@ gzip: eos.img
 
 clean:
 	rm -f eos.img
-	rm -f ubuntu.img
+	rm -f ubuntu.iso
 	rm -f product_key.txt
 	rm -f system-images/**/*.tar
 	sudo rm -f $(EMBASSY_BINS)
@@ -38,10 +38,8 @@ system-images/compat/compat.tar: $(COMPAT_SRC)
 system-images/utils/utils.tar: $(UTILS_SRC)
 	cd system-images/utils && DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/x_system/utils --platform=linux/arm64 -o type=docker,dest=utils.tar .
 
-raspios.img:
-	wget https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2022-01-28/2022-01-28-raspios-bullseye-arm64-lite.zip
-	unzip 2022-01-28-raspios-bullseye-arm64-lite.zip
-	mv 2022-01-28-raspios-bullseye-arm64-lite.img raspios.img
+ubuntu.iso:
+	wget -O ubuntu.iso https://releases.ubuntu.com/21.10/ubuntu-21.10-live-server-amd64.iso
 
 product_key.txt:
 	$(shell which echo) -n "X" > product_key.txt
