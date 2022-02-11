@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{Executor, Sqlite};
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
-use tracing::instrument;
+use tracing::{info, instrument};
 
 use self::target::PackageBackupInfo;
 use crate::action::{ActionImplementation, NoOutput};
@@ -88,12 +88,15 @@ impl BackupActions {
         interfaces: &Interfaces,
         volumes: &Volumes,
     ) -> Result<PackageBackupInfo, Error> {
-        let mut volumes = volumes.to_readonly();
+        let mut volumes = dbg!(volumes.to_readonly());
+        info!("Inserting");
         volumes.insert(VolumeId::Backup, Volume::Backup { readonly: false });
-        let backup_dir = backup_dir(pkg_id);
-        if tokio::fs::metadata(&backup_dir).await.is_err() {
-            tokio::fs::create_dir_all(&backup_dir).await?
+        info!("Inserted");
+        let backup_dir = dbg!(backup_dir(dbg!(pkg_id)));
+        if dbg!(tokio::fs::metadata(&backup_dir).await.is_err()) {
+            dbg!(tokio::fs::create_dir_all(&backup_dir).await)?
         }
+        info!("Create executing");
         self.create
             .execute::<(), NoOutput>(
                 ctx,
@@ -108,47 +111,56 @@ impl BackupActions {
             .await?
             .map_err(|e| eyre!("{}", e.1))
             .with_kind(crate::ErrorKind::Backup)?;
-        let tor_keys = interfaces
-            .tor_keys(&mut ctx.secret_store.acquire().await?, pkg_id)
-            .await?
-            .into_iter()
-            .map(|(id, key)| {
-                (
-                    id,
-                    base32::encode(base32::Alphabet::RFC4648 { padding: true }, &key.as_bytes()),
-                )
-            })
-            .collect();
-        let tmp_path = Path::new(BACKUP_DIR)
+
+        info!("Create executed create backup");
+        let tor_keys = dbg!(dbg!(
+            interfaces
+                .tor_keys(&mut dbg!(ctx.secret_store.acquire().await)?, pkg_id)
+                .await
+        )?
+        .into_iter()
+        .map(|(id, key)| {
+            (
+                id,
+                base32::encode(base32::Alphabet::RFC4648 { padding: true }, &key.as_bytes()),
+            )
+        })
+        .collect());
+        let tmp_path = dbg!(Path::new(BACKUP_DIR)
             .join(pkg_id)
-            .join(format!("{}.s9pk", pkg_id));
-        let s9pk_path = ctx
+            .join(format!("{}.s9pk", pkg_id)));
+        let s9pk_path = dbg!(ctx
             .datadir
             .join(PKG_ARCHIVE_DIR)
             .join(pkg_id)
             .join(pkg_version.as_str())
-            .join(format!("{}.s9pk", pkg_id));
-        let mut infile = File::open(&s9pk_path).await?;
+            .join(format!("{}.s9pk", pkg_id)));
+        info!("Starting to open files");
+        let mut infile = dbg!(File::open(&s9pk_path).await)?;
+        info!("outfile1: {:?}", tmp_path);
         let mut outfile = AtomicFile::new(&tmp_path).await?;
-        tokio::io::copy(&mut infile, &mut *outfile)
-            .await
-            .with_ctx(|_| {
-                (
-                    crate::ErrorKind::Filesystem,
-                    format!("cp {} -> {}", s9pk_path.display(), tmp_path.display()),
-                )
-            })?;
-        outfile.save().await?;
+        info!("Copying");
+        dbg!(tokio::io::copy(&mut infile, &mut *outfile).await).with_ctx(|_| {
+            (
+                crate::ErrorKind::Filesystem,
+                format!("cp {} -> {}", s9pk_path.display(), tmp_path.display()),
+            )
+        })?;
+        dbg!(outfile.save().await)?;
         let timestamp = Utc::now();
         let metadata_path = Path::new(BACKUP_DIR).join(pkg_id).join("metadata.cbor");
+        info!("New outfile: {:?}", metadata_path);
         let mut outfile = AtomicFile::new(&metadata_path).await?;
+        info!("writting");
         outfile
             .write_all(&IoFormat::Cbor.to_vec(&BackupMetadata {
                 timestamp,
                 tor_keys,
             })?)
             .await?;
+        info!("Saving");
         outfile.save().await?;
+        info!("Done");
         Ok(PackageBackupInfo {
             os_version: Current::new().semver().into(),
             title: pkg_title.to_owned(),

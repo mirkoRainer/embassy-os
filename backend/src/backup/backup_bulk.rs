@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tokio::io::AsyncWriteExt;
 use torut::onion::TorSecretKeyV3;
-use tracing::instrument;
+use tracing::{info, instrument};
 
 use super::target::BackupTargetId;
 use super::PackageBackupReport;
@@ -256,19 +256,25 @@ async fn perform_backup<Db: DbHandle>(
             .check(&mut db)
             .await?
         {
+            info!("Backing up {}", package_id);
             installed_model
         } else {
+            info!("Could not find in db {}, continuing", package_id);
             continue;
         };
-        let main_status_model = installed_model.clone().status().main();
+        let main_status_model = dbg!(installed_model.clone().status().main());
 
         let mut tx = db.begin().await?; // for lock scope
+        info!("starting tx");
         main_status_model.lock(&mut tx, LockType::Write).await?;
-        let (started, health) = match main_status_model.get(&mut tx, true).await?.into_owned() {
+        info!("locking main_status_model");
+        let (started, health) = match dbg!(main_status_model.get(&mut tx, true).await?.into_owned())
+        {
             MainStatus::Starting => (Some(Utc::now()), Default::default()),
             MainStatus::Running { started, health } => (Some(started), health.clone()),
             MainStatus::Stopped | MainStatus::Stopping => (None, Default::default()),
             MainStatus::BackingUp { .. } => {
+                info!("Should be insertining backup report");
                 backup_report.insert(
                     package_id,
                     PackageBackupReport {
@@ -280,6 +286,7 @@ async fn perform_backup<Db: DbHandle>(
                 continue;
             }
         };
+        info!("Setting main status model to backing up");
         main_status_model
             .put(
                 &mut tx,
@@ -289,14 +296,19 @@ async fn perform_backup<Db: DbHandle>(
                 },
             )
             .await?;
+        info!("Saving tx");
         tx.save().await?; // drop locks
+        info!("Done Saving tx");
 
-        let manifest = installed_model
-            .clone()
-            .manifest()
-            .get(&mut db, true)
-            .await?;
+        let manifest = dbg!(
+            installed_model
+                .clone()
+                .manifest()
+                .get(&mut db, true)
+                .await?
+        );
 
+        info!("Start maniferst id + version syncronized");
         ctx.managers
             .get(&(manifest.id.clone(), manifest.version.clone()))
             .await
@@ -306,11 +318,15 @@ async fn perform_backup<Db: DbHandle>(
             .synchronize()
             .await;
 
+        info!("Start tx2");
         let mut tx = db.begin().await?;
+
+        info!("Lock installed mode");
 
         installed_model.lock(&mut tx, LockType::Write).await?;
 
         let guard = backup_guard.mount_package_backup(&package_id).await?;
+        info!("mounted _package_backup");
         let res = manifest
             .backup
             .create(
@@ -322,7 +338,10 @@ async fn perform_backup<Db: DbHandle>(
                 &manifest.volumes,
             )
             .await;
+        info!("Unmount guard");
         guard.unmount().await?;
+
+        info!("backup_report.insert: {}", package_id);
         backup_report.insert(
             package_id.clone(),
             PackageBackupReport {
@@ -331,16 +350,23 @@ async fn perform_backup<Db: DbHandle>(
         );
 
         if let Ok(pkg_meta) = res {
+            info!(
+                "installed_model
+            .last_backup  {:?} ",
+                pkg_meta.timestamp
+            );
             installed_model
                 .last_backup()
                 .put(&mut tx, &Some(pkg_meta.timestamp))
                 .await?;
+            info!("Backup guard inserting {:?} {:?}", package_id, pkg_meta);
             backup_guard
                 .metadata
                 .package_backups
                 .insert(package_id, pkg_meta);
         }
 
+        info!("Putting main status model to {:?}", started);
         main_status_model
             .put(
                 &mut tx,
@@ -351,6 +377,7 @@ async fn perform_backup<Db: DbHandle>(
             )
             .await?;
         tx.save().await?;
+        info!("Done tx2");
     }
 
     let (root_ca_key, root_ca_cert) = ctx.net_controller.ssl.export_root_ca().await?;
