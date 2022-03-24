@@ -72,10 +72,8 @@
             <!-- shadow element for masking input -->
             <ion-input
               type="text"
-              [style.display]="
+              *ngIf="
                 spec.type === 'string' && spec.masked && !unmasked[entry.key]
-                  ? 'none'
-                  : 'block'
               "
               [inputmode]="spec.type === 'number' ? 'tel' : 'text'"
               [placeholder]="spec.placeholder || 'Enter ' + spec.name"
@@ -86,10 +84,8 @@
             </ion-input>
             <ion-input
               type="text"
-              [style.display]="
+              *ngIf="
                 spec.type === 'string' && spec.masked && !unmasked[entry.key]
-                  ? 'none'
-                  : 'block'
               "
               [inputmode]="spec.type === 'number' ? 'tel' : 'text'"
               [placeholder]="spec.placeholder || 'Enter ' + spec.name"

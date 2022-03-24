@@ -22,37 +22,23 @@
                     style="margin-right: 16px"
                   ></ion-icon>
                   <ion-input
-                    maskInput
+                    [ngModel]="passwordOutput"
+                    (ngModelChange)="setPassword($event)"
                     type="text"
                     name="password"
-                    [style.display]="!unmasked ? 'block' : 'none'"
-                    (ionChange)="error = ''"
+                    *ngIf="masked"
                   ></ion-input>
                   <ion-input
                     type="text"
                     name="password"
-                    [style.display]="!unmasked ? 'none' : 'block'"
+                    *ngIf="!masked"
                     [(ngModel)]="password"
                     (ionChange)="error = ''"
                   ></ion-input>
-
-                  <!-- <ion-input [type]="'text'" name="password" (change)="toggleMaskPassword($event)" [value]="unmasked ? password : (password | mask)" (ionChange)="error = ''"></ion-input> -->
-                  <!-- <ion-input name="password" [type]="'text'" (blur)="toggleMaskPassword($event)" [ngModel]="unmasked ? password : (password | mask)" (ionChange)="error = ''"></ion-input> -->
-                  <!-- <ion-input name="password" type="text" [value]="unmasked ? password : (password | mask)" (ionChange)="setPassword($event); error = ''"></ion-input> -->
-                  <!-- <ion-input name="password" type="text" mask="{*}" (ngModelChange)="setPassword($event)" [ngModel]="password"></ion-input> -->
-                  <!-- <ion-input maskInput [unmasked]="unmasked" [type]="'text'" name="password" (ngModelChange)="password=($event)" [ngModel]="password"  (ionChange)="error = ''"></ion-input> -->
-                  <!-- <ion-input
-                    [type]="'text'"
-                    name="password"
-                    mask="unmasked ? password : '●'"
-                    (ngModelChange)="password=($event)"
-                    [ngModel]="password"
-                    (ionChange)="error = ''"
-                  ></ion-input> -->
                   <ion-button fill="clear" color="light" (click)="toggleMask()">
                     <ion-icon
                       slot="icon-only"
-                      [name]="unmasked ? 'eye-off-outline' : 'eye-outline'"
+                      [name]="masked ? 'eye-outline' : 'eye-off-outline'"
                       size="small"
                     ></ion-icon>
                   </ion-button>

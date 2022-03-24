@@ -9,11 +9,13 @@ import { MaskPipe } from 'src/app/pipes/mask/mask.pipe'
   selector: 'login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
-  // providers: [MaskPipe],
+  providers: [MaskPipe],
 })
 export class LoginPage {
+  passwordInput = ''
+  passwordOutput = ''
   password = ''
-  unmasked = false
+  masked = true
   error = ''
   loader: HTMLIonLoadingElement
   patchConnectionSub: Subscription
@@ -23,8 +25,8 @@ export class LoginPage {
     private readonly authService: AuthService,
     private readonly loadingCtrl: LoadingController,
     private readonly api: ApiService,
-  ) // private readonly mask: MaskPipe,
-  {}
+    private readonly mask: MaskPipe,
+  ) {}
 
   ngOnDestroy() {
     if (this.loader) {
@@ -37,20 +39,22 @@ export class LoginPage {
   }
 
   toggleMask() {
-    this.unmasked = !this.unmasked
-    console.log(
-      'UNMASKED: ',
-      this.unmasked,
-      'PW: ',
-      this.password,
-      this.password.length,
-    )
+    this.masked = !this.masked
   }
 
   setPassword(newValue) {
-    console.log('NEW VALUE :', newValue)
+    console.log('NEW VALUE :', newValue, 'PW: ', this.password)
+    let i = 0
     this.password = newValue
-    // return this.unmasked ? newValue.target.value : this.mask.transform(newValue.target.value)
+      .split('')
+      .map(x => {
+        if (x === '●') {
+          return this.password[i++]
+        }
+        return x
+      })
+      .join('')
+    this.passwordOutput = this.mask.transform(this.password)
   }
 
   async submit() {
@@ -72,6 +76,7 @@ export class LoginPage {
 
       this.authService.setVerified()
       this.password = ''
+      this.passwordOutput = ''
     } catch (e) {
       this.error = e.code === 34 ? 'Invalid Password' : e.message
     } finally {
