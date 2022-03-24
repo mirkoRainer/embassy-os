@@ -5,6 +5,9 @@ import { FormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
 import { LoginPage } from './login.page'
 import { SharedPipesModule } from '@start9labs/shared'
+import { MaskPipeModule } from 'src/app/pipes/mask/mask.module'
+import { MaskInputModule } from '../../../../../shared/src/directives/mask/mask.module'
+import { NgxMaskModule } from 'ngx-mask'
 
 const routes: Routes = [
   {
@@ -20,6 +23,9 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes),
     SharedPipesModule,
+    MaskPipeModule,
+    MaskInputModule,
+    NgxMaskModule,
   ],
   declarations: [LoginPage],
 })

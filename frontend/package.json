@@ -46,6 +46,7 @@
     "monaco-editor": "^0.32.0",
     "mustache": "^4.2.0",
     "ng-qrcode": "^6.0.0",
+    "ngx-mask": "^13.1.1",
     "patch-db-client": "file: ../../../patch-db/client",
     "pbkdf2": "^3.1.2",
     "rxjs": "^6.6.7",
