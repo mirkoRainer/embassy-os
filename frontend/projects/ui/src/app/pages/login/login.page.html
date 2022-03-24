@@ -21,19 +21,34 @@
                     name="key-outline"
                     style="margin-right: 16px"
                   ></ion-icon>
+                  <ion-input
+                    maskInput
+                    type="text"
+                    name="password"
+                    [style.display]="!unmasked ? 'block' : 'none'"
+                    (ionChange)="error = ''"
+                  ></ion-input>
+                  <ion-input
+                    type="text"
+                    name="password"
+                    [style.display]="!unmasked ? 'none' : 'block'"
+                    [(ngModel)]="password"
+                    (ionChange)="error = ''"
+                  ></ion-input>
+
                   <!-- <ion-input [type]="'text'" name="password" (change)="toggleMaskPassword($event)" [value]="unmasked ? password : (password | mask)" (ionChange)="error = ''"></ion-input> -->
                   <!-- <ion-input name="password" [type]="'text'" (blur)="toggleMaskPassword($event)" [ngModel]="unmasked ? password : (password | mask)" (ionChange)="error = ''"></ion-input> -->
-                  <!-- <ion-input name="password" [type]="'text'" (ngModelChange)="toggleMaskPassword($event)" [ngModel]="unmasked ? password : (password | mask)" (ionChange)="error = ''"></ion-input> -->
-                  <!-- <ion-input [type]="unmasked ? 'text' : 'password'" name="text" [(ngModel)]="password" (ionChange)="error = ''"></ion-input> -->
+                  <!-- <ion-input name="password" type="text" [value]="unmasked ? password : (password | mask)" (ionChange)="setPassword($event); error = ''"></ion-input> -->
+                  <!-- <ion-input name="password" type="text" mask="{*}" (ngModelChange)="setPassword($event)" [ngModel]="password"></ion-input> -->
                   <!-- <ion-input maskInput [unmasked]="unmasked" [type]="'text'" name="password" (ngModelChange)="password=($event)" [ngModel]="password"  (ionChange)="error = ''"></ion-input> -->
-                  <ion-input
+                  <!-- <ion-input
                     [type]="'text'"
                     name="password"
                     mask="unmasked ? password : '●'"
                     (ngModelChange)="password=($event)"
                     [ngModel]="password"
                     (ionChange)="error = ''"
-                  ></ion-input>
+                  ></ion-input> -->
                   <ion-button fill="clear" color="light" (click)="toggleMask()">
                     <ion-icon
                       slot="icon-only"

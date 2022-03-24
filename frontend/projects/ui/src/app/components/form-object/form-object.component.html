@@ -69,11 +69,27 @@
           >
           </ion-textarea>
           <ng-template #notTextArea>
+            <!-- shadow element for masking input -->
             <ion-input
-              [type]="
+              type="text"
+              [style.display]="
                 spec.type === 'string' && spec.masked && !unmasked[entry.key]
-                  ? 'password'
-                  : 'text'
+                  ? 'none'
+                  : 'block'
+              "
+              [inputmode]="spec.type === 'number' ? 'tel' : 'text'"
+              [placeholder]="spec.placeholder || 'Enter ' + spec.name"
+              [formControlName]="entry.key"
+              (ionFocus)="presentAlertChangeWarning(entry.key, spec)"
+              (ionChange)="handleInputChange()"
+            >
+            </ion-input>
+            <ion-input
+              type="text"
+              [style.display]="
+                spec.type === 'string' && spec.masked && !unmasked[entry.key]
+                  ? 'none'
+                  : 'block'
               "
               [inputmode]="spec.type === 'number' ? 'tel' : 'text'"
               [placeholder]="spec.placeholder || 'Enter ' + spec.name"

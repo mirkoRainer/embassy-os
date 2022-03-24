@@ -25,7 +25,7 @@ const routes: Routes = [
     SharedPipesModule,
     MaskPipeModule,
     MaskInputModule,
-    NgxMaskModule,
+    NgxMaskModule.forRoot(),
   ],
   declarations: [LoginPage],
 })

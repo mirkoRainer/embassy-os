@@ -10,10 +10,9 @@ import {
   selector: '[maskInput]',
 })
 export class MaskInputDirective implements OnInit {
-  @Input() unmasked: boolean
+  // @Input() unmasked: boolean
 
-  constructor(private elementRef: ElementRef) // private ogValue: string
-  {}
+  constructor(private elementRef: ElementRef) {}
 
   ngOnInit(): void {
     this.elementRef.nativeElement.value = this.transform(
@@ -22,19 +21,15 @@ export class MaskInputDirective implements OnInit {
   }
 
   transform(val: string, max = 16): string {
-    // console.log(this.unmasked, val)
     if (!val) return val
-    // if (unmasked) return val
     const times = val.length <= max ? val.length : max
     return '●'.repeat(times)
   }
 
-  @HostListener('ngModelChange', ['$event'])
+  @HostListener('keypress', ['$event'])
   ngOnChanges() {
-    console.log(this.unmasked, this.elementRef.nativeElement.value)
-    // this.ogValue = this.elementRef.nativeElement.value
-    this.elementRef.nativeElement.value = this.unmasked
-      ? this.elementRef.nativeElement.value
-      : this.transform(this.elementRef.nativeElement.value)
+    this.elementRef.nativeElement.value = this.transform(
+      this.elementRef.nativeElement.value,
+    )
   }
 }
